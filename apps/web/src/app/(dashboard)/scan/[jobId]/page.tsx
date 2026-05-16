@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import { ScanProgress } from '@/components/scan/scan-progress'
 import { ReportTabs } from '@/components/report/report-tabs'
+import { RescanButton } from '@/components/scan/rescan-button'
 
 interface Props {
   params: { jobId: string }
@@ -50,10 +51,13 @@ export default async function ScanDetailPage({ params }: Props) {
       .eq('job_id', job.id)
 
     return (
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Scan Report</h1>
-          <p className="text-muted-foreground text-sm mt-1 font-mono">{job.url}</p>
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Scan Report</h1>
+            <p className="text-muted-foreground text-sm mt-1 font-mono truncate max-w-xl">{job.url}</p>
+          </div>
+          <RescanButton job={job} />
         </div>
         <ReportTabs
           job={job}
@@ -67,7 +71,7 @@ export default async function ScanDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <ScanProgress job={job} />
     </div>
   )

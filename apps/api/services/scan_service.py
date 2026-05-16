@@ -130,7 +130,7 @@ async def run_scan_job(
             )
             for f in findings_response.findings:
                 get_supabase().table("findings").insert({
-                    "id": f.id,
+                    "id": str(uuid.uuid4()),
                     "job_id": job_id,
                     "category": f.category,
                     "title": f.title,
@@ -156,7 +156,7 @@ async def run_scan_job(
             )
             for tc in test_cases_response.test_cases:
                 get_supabase().table("test_cases").insert({
-                    "id": tc.id,
+                    "id": str(uuid.uuid4()),
                     "job_id": job_id,
                     "case_id": tc.case_id,
                     "title": tc.title,

@@ -1,8 +1,9 @@
 import asyncio
 import sys
 
-# Windows requires ProactorEventLoop for subprocess (Playwright)
-if sys.platform == "win32":
+# Python 3.14+ on Windows: ProactorEventLoop is now the default,
+# no need to set policy. For older versions keep it as fallback.
+if sys.platform == "win32" and sys.version_info < (3, 14):
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 from fastapi import FastAPI

@@ -19,7 +19,13 @@
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/health\")",
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/docs\" -UseBasicParsing | Select-Object -ExpandProperty StatusCode 2>&1; \\(Invoke-WebRequest \"http://localhost:8000/docs\" -UseBasicParsing\\).StatusCode)",
       "PowerShell(pip install pytest pytest-asyncio pytest-cov 2>&1)",
-      "PowerShell(\\(Invoke-WebRequest \"http://localhost:8000/health\" -UseBasicParsing\\).StatusCode; \\(Invoke-WebRequest \"http://localhost:3000\" -UseBasicParsing\\).StatusCode)"
+      "PowerShell(\\(Invoke-WebRequest \"http://localhost:8000/health\" -UseBasicParsing\\).StatusCode; \\(Invoke-WebRequest \"http://localhost:3000\" -UseBasicParsing\\).StatusCode)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }; Write-Host \"Port 8000 cleared\")",
+      "PowerShell(Invoke-RestMethod \"http://localhost:8000/health\")",
+      "PowerShell(pip install groq 2>&1)",
+      "PowerShell(pip show groq 2>&1)",
+      "PowerShell(Stop-Process -Force)",
+      "PowerShell(Get-ChildItem \"d:\\\\workspace\\\\Tester\\\\TestPilot-AI\\\\apps\\\\web\\\\src\\\\app\\\\\\(dashboard\\)\" -Recurse -Filter \"page.tsx\" | ForEach-Object { Select-String -Path $_.FullName -Pattern \"max-w-\" | Select-Object Path, Line })"
     ]
   }
 }

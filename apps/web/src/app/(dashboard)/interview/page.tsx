@@ -1,16 +1,20 @@
-import { InterviewTrainer } from '@/components/interview/interview-trainer'
+import dynamic from 'next/dynamic'
+import { PageHeader } from '@/components/layout/page-header'
 
 export const metadata = { title: 'AI Interview Trainer' }
 
+const InterviewTrainer = dynamic(
+  () => import('@/components/interview/interview-trainer').then((m) => m.InterviewTrainer),
+  {
+    ssr: false,
+    loading: () => <div className="h-64 rounded-xl border border-border animate-pulse bg-muted/30" />,
+  }
+)
+
 export default function InterviewPage() {
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">AI Interview Trainer</h1>
-        <p className="text-muted-foreground mt-1">
-          Practice QA interviews with AI that grades your answers like a senior interviewer.
-        </p>
-      </div>
+    <div className="max-w-5xl mx-auto space-y-6">
+      <PageHeader titleKey="interviewTitle" descKey="interviewDesc" />
       <InterviewTrainer />
     </div>
   )

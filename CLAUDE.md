@@ -51,7 +51,7 @@ pnpm dev:web      # frontend only
 - AI SDK: dùng `google-genai` (mới), KHÔNG dùng `google-generativeai` (deprecated)
 - Supabase Python: dùng version `2.4.6`, version mới hơn kéo `pyiceberg` không tương thích Python 3.14
 - Supabase client init phải lazy (không init ở module level) để tránh crash khi chưa có `.env`
-- Model: `gemini-2.0-flash` cho cả vision và text
+- Model: `gemini-1.5-flash` cho cả vision và text (2.0-flash free tier quá hạn chế)
 
 ## DB Schema (9 tables)
 `profiles`, `projects`, `scan_jobs`, `findings`, `test_cases`, `bug_reports`, `artifacts`, `interview_sessions`, `game_attempts`

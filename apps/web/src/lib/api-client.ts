@@ -4,12 +4,21 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const supabase = createClient()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
 
-  if (!session?.access_token) return {}
-  return { Authorization: `Bearer ${session.access_token}` }
+  // getSession() first, refresh if needed
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (session?.access_token) {
+    return { Authorization: `Bearer ${session.access_token}` }
+  }
+
+  // Try refreshing the session
+  const { data: { session: refreshed } } = await supabase.auth.refreshSession()
+  if (refreshed?.access_token) {
+    return { Authorization: `Bearer ${refreshed.access_token}` }
+  }
+
+  throw new Error('Session expired. Please sign in again.')
 }
 
 async function request<T>(

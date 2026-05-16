@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -7,118 +7,96 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
-import { Zap, Loader2 } from 'lucide-react'
+import { Zap, ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
+import { motion } from 'framer-motion'
+import { GlowButton } from '@/components/ui/glow-button'
+import { GlassCard } from '@/components/ui/glass-card'
 
-const registerSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  displayName: z.string().min(2, 'Name must be at least 2 characters'),
+const schema = z.object({
+  displayName: z.string().min(2, 'Min 2 characters'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Min 8 characters'),
 })
-
-type RegisterForm = z.infer<typeof registerSchema>
+type Form = z.infer<typeof schema>
 
 export default function RegisterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const { register, handleSubmit, formState: { errors } } = useForm<Form>({ resolver: zodResolver(schema) })
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) })
-
-  async function onSubmit(data: RegisterForm) {
+  async function onSubmit(data: Form) {
     setLoading(true)
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: { data: { display_name: data.displayName } },
     })
-    if (error) {
-      toast.error(error.message)
-      setLoading(false)
-      return
-    }
-    toast.success('Account created! Check your email to confirm.')
+    if (error) { toast.error(error.message); setLoading(false); return }
+    toast.success('Account created! Check your email.')
     router.push('/dashboard')
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl">TestPilot AI</span>
-          </Link>
-        </div>
+  const fields = [
+    { key: 'displayName' as const, label: 'Display name', type: 'text', placeholder: 'Your name' },
+    { key: 'email' as const,       label: 'Email',        type: 'email', placeholder: 'you@example.com' },
+    { key: 'password' as const,    label: 'Password',     type: 'password', placeholder: 'Min. 8 characters' },
+  ]
 
-        <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
-          <h1 className="text-2xl font-bold mb-1">Create your account</h1>
-          <p className="text-muted-foreground text-sm mb-6">Start scanning websites for free</p>
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[500px] bg-violet-600/8 blur-[120px]" />
+        <div className="grid-pattern absolute inset-0 opacity-30" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md relative z-10"
+      >
+        <Link href="/" className="flex items-center justify-center gap-2.5 mb-8">
+          <div className="h-9 w-9 rounded-xl bg-violet-600 flex items-center justify-center shadow-neon-purple">
+            <Zap className="h-5 w-5 text-white" />
+          </div>
+          <span className="font-bold text-xl">TestPilot <span className="text-violet-400">AI</span></span>
+        </Link>
+
+        <GlassCard className="p-7">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold mb-1">Create account</h1>
+            <p className="text-sm text-muted-foreground">Join the AI-powered QA platform</p>
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Display name</label>
-              <input
-                {...register('displayName')}
-                type="text"
-                placeholder="Your name"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              {errors.displayName && (
-                <p className="text-destructive text-xs mt-1">{errors.displayName.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Email</label>
-              <input
-                {...register('email')}
-                type="email"
-                placeholder="you@example.com"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              {errors.email && (
-                <p className="text-destructive text-xs mt-1">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Password</label>
-              <input
-                {...register('password')}
-                type="password"
-                placeholder="Min. 8 characters"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              {errors.password && (
-                <p className="text-destructive text-xs mt-1">{errors.password.message}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
-            >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              Create account
-            </button>
+            {fields.map((f) => (
+              <div key={f.key}>
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1.5 block">{f.label}</label>
+                <input
+                  {...register(f.key)}
+                  type={f.type}
+                  placeholder={f.placeholder}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all"
+                />
+                {errors[f.key] && <p className="text-red-400 text-xs mt-1">{errors[f.key]?.message}</p>}
+              </div>
+            ))}
+            <GlowButton type="submit" loading={loading} className="w-full mt-2" size="md">
+              Create account <ArrowRight className="h-4 w-4" />
+            </GlowButton>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
+          <p className="text-center text-sm text-muted-foreground/70 mt-5">
             Already have an account?{' '}
-            <Link href="/login" className="text-primary hover:underline font-medium">
+            <Link href="/login" className="text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300 font-medium transition-colors">
               Sign in
             </Link>
           </p>
-        </div>
-      </div>
+        </GlassCard>
+      </motion.div>
     </div>
   )
 }
+
+

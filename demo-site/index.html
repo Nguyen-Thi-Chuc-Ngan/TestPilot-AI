@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- BUG: Missing viewport meta tag -->
+  <title>ShopEasy - Online Store</title>
+  <!-- BUG: No description meta tag for SEO -->
+  <style>
+    /* BUG: No CSS reset, inconsistent baseline */
+    body { font-family: Arial; background: #fff; }
+
+    /* BUG: Fixed pixel font sizes — not accessible */
+    h1 { font-size: 32px; color: #1a1a1a; }
+    h2 { font-size: 20px; }
+
+    nav {
+      background: #4a90d9;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      /* BUG: No justify-content, links pile up */
+    }
+
+    /* BUG: White text on light blue — poor contrast ratio (~2.8:1, fails WCAG AA) */
+    nav a { color: #d0e8ff; text-decoration: none; margin: 0 8px; font-size: 14px; }
+
+    .hero {
+      /* BUG: Text on image without overlay — readability depends on image */
+      background: url('https://via.placeholder.com/1200x400/cccccc/999999?text=Hero+Image') no-repeat center;
+      background-size: cover;
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    /* BUG: White text directly on image without contrast overlay */
+    .hero h1 { color: white; text-shadow: none; }
+    .hero p { color: white; }
+
+    /* BUG: Button has no :focus style — keyboard nav is broken */
+    .btn-primary {
+      background: #ff6b35;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    /* BUG: Hover state missing feedback for the secondary button */
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid #ff6b35;
+      color: #ff6b35;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+
+    .products {
+      display: grid;
+      /* BUG: Fixed 3 columns — breaks on tablet/mobile, no responsive grid */
+      grid-template-columns: 320px 320px 320px;
+      gap: 20px;
+      padding: 40px 20px;
+      overflow-x: auto;
+    }
+
+    .product-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      /* BUG: No alt text on product images below */
+    }
+
+    /* BUG: Price color is gray — doesn't stand out */
+    .price { color: #888; font-size: 18px; font-weight: bold; }
+
+    /* BUG: Discounted price shown without strikethrough on original */
+    .price-original { color: #888; font-size: 14px; }
+
+    .product-info { padding: 16px; }
+
+    .form-section {
+      background: #f5f5f5;
+      padding: 40px 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* BUG: Form labels not associated with inputs (no for/id) */
+    label { display: block; margin-bottom: 4px; font-weight: bold; }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      /* BUG: No :focus style on inputs */
+    }
+
+    footer {
+      /* BUG: Nearly invisible text — #aaaaaa on white = 2.32:1 contrast ratio */
+      color: #aaaaaa;
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+    }
+
+    /* BUG: No skip navigation link for screen readers */
+    /* BUG: No visible focus indicators anywhere */
+  </style>
+</head>
+<body>
+
+<!-- BUG: No skip-to-content link -->
+
+<nav>
+  <!-- BUG: Nav has no aria-label -->
+  <!-- BUG: Logo is not a link to home -->
+  <span style="color:white;font-weight:bold;font-size:20px">ShopEasy</span>
+  <a href="#">Home</a>
+  <a href="#">Products</a>
+  <a href="#">About</a>
+  <a href="#">Contact</a>
+  <!-- BUG: Cart button looks like a link but has no visible count -->
+  <a href="#" style="margin-left:auto">🛒 Cart</a>
+</nav>
+
+<section class="hero">
+  <h1>Summer Sale — Up to 70% Off</h1>
+  <!-- BUG: Vague/non-descriptive CTA -->
+  <p>Don't miss out on the best deals of the season</p>
+  <button class="btn-primary" onclick="alert('Added!')">Click Here</button>
+  <!-- BUG: Two identical buttons next to each other, no distinction -->
+  <button class="btn-secondary" style="margin-left:8px">Click Here</button>
+</section>
+
+<main id="main">
+  <h2 style="padding:0 20px;margin-top:40px">Featured Products</h2>
+
+  <div class="products">
+
+    <!-- Product 1 -->
+    <div class="product-card">
+      <!-- BUG: Missing alt attribute entirely -->
+      <img src="https://via.placeholder.com/320x200/f0e6d3/8b6914?text=Product+1">
+      <div class="product-info">
+        <h3>Wireless Headphones Pro</h3>
+        <!-- BUG: Discount label says 50% off but prices don't reflect that -->
+        <span style="background:#ff6b35;color:white;padding:2px 6px;border-radius:3px;font-size:12px">50% OFF</span>
+        <div>
+          <!-- BUG: Original price not struck through, looks like two prices -->
+          <span class="price-original">$199.99</span>
+          <span class="price">$149.99</span>
+          <!-- Math: $199.99 * 0.5 = $99.99, not $149.99 — wrong discount calculation -->
+        </div>
+        <!-- BUG: Add to Cart button has no type attribute -->
+        <button class="btn-primary" style="margin-top:12px;width:100%">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="product-card">
+      <!-- BUG: alt="" instead of descriptive alt text -->
+      <img src="https://via.placeholder.com/320x200/d3e6f0/146891?text=Product+2" alt="">
+      <div class="product-info">
+        <h3>Smart Watch Series 5</h3>
+        <div>
+          <span class="price">$89.99</span>
+        </div>
+        <button class="btn-primary" style="margin-top:12px;width:100%">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="product-card">
+      <img src="https://via.placeholder.com/320x200/d3f0d6/148a1e?text=Product+3" alt="Running Shoes">
+      <div class="product-info">
+        <h3>Running Shoes Ultra</h3>
+        <div>
+          <span class="price">$129.99</span>
+        </div>
+        <!-- BUG: Disabled button with no explanation why -->
+        <button class="btn-primary" style="margin-top:12px;width:100%;opacity:0.5" disabled>Add to Cart</button>
+        <!-- BUG: No "Out of Stock" label or explanation for disabled button -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Newsletter signup form with bugs -->
+  <div class="form-section">
+    <h2>Subscribe to Newsletter</h2>
+    <!-- BUG: Form has no action, no method attribute (implied GET — sends to current URL with ?email= in history) -->
+    <form>
+      <!-- BUG: label for attribute doesn't match input id -->
+      <label for="email-address">Email Address</label>
+      <input type="text" id="email" placeholder="Enter your email">
+      <!-- BUG: input type is "text" not "email" — no email validation -->
+      <!-- BUG: No required attribute -->
+
+      <label for="name-field">Full Name</label>
+      <!-- BUG: id doesn't exist -->
+      <input type="text" placeholder="Your name">
+
+      <!-- BUG: Submit button is type="button", form never submits -->
+      <button type="button" class="btn-primary" style="width:100%">Subscribe</button>
+
+      <!-- BUG: No success/error feedback states -->
+      <!-- BUG: No privacy policy link near form -->
+    </form>
+  </div>
+</main>
+
+<!-- BUG: Footer has no landmarks, no useful links -->
+<footer>
+  <p>© 2024 ShopEasy. All rights reserved. Contact us at support@shopeasy.com</p>
+  <!-- BUG: Email is plain text, not a mailto: link -->
+</footer>
+
+<!-- BUG: No structured data / schema.org markup for products -->
+<!-- BUG: No lang attribute on html element — wait, it's there but wrong: html says lang="en" but content could be multilingual -->
+
+</body>
+</html>

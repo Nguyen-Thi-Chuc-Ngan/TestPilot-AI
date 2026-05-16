@@ -1,0 +1,15 @@
+{
+  "type": "bug_report",
+  "title": "Login CTA hidden on mobile",
+  "severity": "major",
+  "priority": "P1",
+  "steps_to_reproduce": [
+    "Open / on 375px width",
+    "Observe CTA overlapped by hero"
+  ],
+  "expected": "CTA visible",
+  "actual": "CTA hidden under hero",
+  "evidence_refs": ["screenshot://fixtures/demo-1.png"],
+  "assumptions": ["no mobile CSS loaded"],
+  "notes": "z-index overlap"
+}

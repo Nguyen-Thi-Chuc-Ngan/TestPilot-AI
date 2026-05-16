@@ -1,0 +1,4 @@
+{
+  "user_prompt": "Scan https://demo.testpilot.local and generate 1 bug_report",
+  "evidence_refs": ["screenshot://fixtures/demo-1.png"]
+}

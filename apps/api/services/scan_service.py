@@ -1,8 +1,8 @@
-import asyncio
+﻿import asyncio
 import uuid
 from datetime import datetime
 from typing import Optional, AsyncIterator
-from supabase import create_client
+from supabase import create_client, Client
 from config import settings
 from services.playwright_service import scan_url, screenshot_to_base64
 from services.ai_service import (
@@ -16,7 +16,14 @@ import structlog
 
 logger = structlog.get_logger()
 
-_supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+_supabase: Optional[Client] = None
+
+
+def get_supabase() -> Client:
+    global _supabase
+    if _supabase is None:
+        _supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+    return _supabase
 
 # SSE progress channels: job_id -> asyncio.Queue
 _progress_queues: dict[str, asyncio.Queue] = {}
@@ -56,7 +63,7 @@ async def create_scan_job(
     roast_mode: bool,
 ) -> str:
     job_id = str(uuid.uuid4())
-    _supabase.table("scan_jobs").insert({
+    get_supabase().table("scan_jobs").insert({
         "id": job_id,
         "user_id": user_id,
         "url": url,
@@ -75,11 +82,11 @@ async def run_scan_job(
     mode: str,
     roast_mode: bool,
 ) -> None:
-    """Full scan pipeline — runs in background."""
+    """Full scan pipeline â€” runs in background."""
     import json
 
     async def update_status(status: str, **kwargs):
-        _supabase.table("scan_jobs").update({"status": status, **kwargs}).eq("id", job_id).execute()
+        get_supabase().table("scan_jobs").update({"status": status, **kwargs}).eq("id", job_id).execute()
 
     try:
         await update_status("running", started_at=datetime.utcnow().isoformat())
@@ -102,7 +109,7 @@ async def run_scan_job(
 
         # Save screenshot artifacts
         for art_type, art_url in [("full_page", full_url), ("screenshot", viewport_url)]:
-            _supabase.table("artifacts").insert({
+            get_supabase().table("artifacts").insert({
                 "id": str(uuid.uuid4()),
                 "job_id": job_id,
                 "type": art_type,
@@ -122,7 +129,7 @@ async def run_scan_job(
                 roast_mode=roast_mode,
             )
             for f in findings_response.findings:
-                _supabase.table("findings").insert({
+                get_supabase().table("findings").insert({
                     "id": f.id,
                     "job_id": job_id,
                     "category": f.category,
@@ -148,7 +155,7 @@ async def run_scan_job(
                 url, scan_result.dom_context, requirements, findings_summary
             )
             for tc in test_cases_response.test_cases:
-                _supabase.table("test_cases").insert({
+                get_supabase().table("test_cases").insert({
                     "id": tc.id,
                     "job_id": job_id,
                     "case_id": tc.case_id,
@@ -170,7 +177,7 @@ async def run_scan_job(
             for f in top_findings:
                 try:
                     bug_report = await generate_bug_report(f.model_dump(), url, viewport_b64)
-                    _supabase.table("bug_reports").insert({
+                    get_supabase().table("bug_reports").insert({
                         "id": str(uuid.uuid4()),
                         "job_id": job_id,
                         "finding_id": f.id,
@@ -192,7 +199,7 @@ async def run_scan_job(
             tc_dicts = [tc.model_dump() for tc in test_cases_response.test_cases]
             script = await generate_playwright_script(url, tc_dicts, scan_result.dom_context)
             script_url = await upload_script(job_id, script)
-            _supabase.table("artifacts").insert({
+            get_supabase().table("artifacts").insert({
                 "id": str(uuid.uuid4()),
                 "job_id": job_id,
                 "type": "script",
@@ -207,10 +214,11 @@ async def run_scan_job(
 
     except Exception as e:
         logger.error("scan_failed", job_id=job_id, error=str(e))
-        _supabase.table("scan_jobs").update({
+        get_supabase().table("scan_jobs").update({
             "status": "failed",
             "error_msg": str(e),
         }).eq("id", job_id).execute()
         await _emit(job_id, -1, status="failed", error=str(e))
     finally:
         _progress_queues.pop(job_id, None)
+

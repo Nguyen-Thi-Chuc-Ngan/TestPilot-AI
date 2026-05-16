@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node --version)",
+      "PowerShell(python --version)",
+      "PowerShell(pip --version)",
+      "PowerShell(pnpm --version)",
+      "PowerShell(pip install fastapi uvicorn pydantic pydantic-settings 2>&1)",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing; $r.StatusCode)",
+      "PowerShell(pip show fastapi google-generativeai playwright 2>&1)",
+      "PowerShell(pip show google-generativeai 2>&1)",
+      "PowerShell(Get-Process python -ErrorAction SilentlyContinue)",
+      "PowerShell(pip install \"supabase==2.4.6\" 2>&1)",
+      "PowerShell(pip install google-generativeai playwright python-jose[cryptography] tenacity structlog aiofiles Pillow 2>&1)",
+      "PowerShell(pip install python-multipart python-dotenv 2>&1)",
+      "PowerShell(pip install google-genai 2>&1)",
+      "PowerShell(pip show google-genai 2>&1)",
+      "PowerShell(\\(Get-Content \"d:\\\\workspace\\\\Tester\\\\TestPilot-AI\\\\apps\\\\api\\\\services\\\\scan_service.py\" -Raw\\) -replace '_supabase\\\\.table', 'get_supabase\\(\\).table' | Set-Content \"d:\\\\workspace\\\\Tester\\\\TestPilot-AI\\\\apps\\\\api\\\\services\\\\scan_service.py\" -Encoding utf8)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/health\")",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/docs\" -UseBasicParsing | Select-Object -ExpandProperty StatusCode 2>&1; \\(Invoke-WebRequest \"http://localhost:8000/docs\" -UseBasicParsing\\).StatusCode)",
+      "PowerShell(pip install pytest pytest-asyncio pytest-cov 2>&1)",
+      "PowerShell(\\(Invoke-WebRequest \"http://localhost:8000/health\" -UseBasicParsing\\).StatusCode; \\(Invoke-WebRequest \"http://localhost:3000\" -UseBasicParsing\\).StatusCode)"
+    ]
+  }
+}

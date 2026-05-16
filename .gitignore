@@ -15,6 +15,7 @@ out/
 dist/
 build/
 *.egg-info/
+apps/web/.next/
 
 # Environment files
 .env

@@ -1,8 +1,8 @@
-import uuid
+﻿import uuid
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from typing import Literal
-from supabase import create_client
+from typing import Literal, Optional
+from supabase import create_client, Client
 from datetime import datetime
 
 from config import settings
@@ -10,7 +10,13 @@ from middleware.auth import get_current_user
 from services.ai_service import evaluate_interview_answer
 
 router = APIRouter()
-_supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+_supabase: Optional[Client] = None
+
+def get_sb() -> Client:
+    global _supabase
+    if _supabase is None:
+        _supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+    return _supabase
 
 
 class EvaluateRequest(BaseModel):
@@ -44,7 +50,7 @@ async def evaluate_answer(body: EvaluateRequest, user: dict = Depends(get_curren
     feedback = await evaluate_interview_answer(body.question, body.answer, body.level)
 
     # Save session for history
-    _supabase.table("interview_sessions").insert({
+    get_sb().table("interview_sessions").insert({
         "id": str(uuid.uuid4()),
         "user_id": user["user_id"],
         "question": body.question,
@@ -56,3 +62,5 @@ async def evaluate_answer(body: EvaluateRequest, user: dict = Depends(get_curren
     }).execute()
 
     return feedback
+
+

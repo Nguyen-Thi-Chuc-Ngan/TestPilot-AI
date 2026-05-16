@@ -1,30 +1,34 @@
 from fastapi import HTTPException, Header
-from jose import jwt, JWTError
+from supabase import create_client, Client
 from config import settings
-import httpx
+from typing import Optional
 
-SUPABASE_JWT_SECRET_URL = "{url}/auth/v1/jwks"
+_supabase: Optional[Client] = None
+
+
+def get_supabase() -> Client:
+    global _supabase
+    if _supabase is None:
+        _supabase = create_client(settings.supabase_url, settings.supabase_anon_key)
+    return _supabase
 
 
 async def get_current_user(authorization: str = Header(None)) -> dict:
-    """Verify Supabase JWT and return user payload."""
+    """Verify Supabase JWT by calling Supabase's own auth endpoint."""
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
 
     token = authorization.removeprefix("Bearer ").strip()
 
     try:
-        # Decode without full verification first to get the sub/user_id
-        # In production, verify against Supabase JWKS
-        payload = jwt.decode(
-            token,
-            settings.supabase_anon_key,
-            algorithms=["HS256"],
-            options={"verify_signature": False},  # Supabase handles signature
-        )
-        user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token: missing user ID")
-        return {"user_id": user_id, "email": payload.get("email", "")}
-    except JWTError as e:
+        # Let Supabase verify the token — most reliable approach
+        sb = get_supabase()
+        response = sb.auth.get_user(token)
+        user = response.user
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return {"user_id": str(user.id), "email": user.email or ""}
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(status_code=401, detail=f"Token validation failed: {e}")

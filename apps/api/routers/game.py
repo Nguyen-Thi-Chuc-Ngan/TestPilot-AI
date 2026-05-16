@@ -1,17 +1,23 @@
-import uuid
+﻿import uuid
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from typing import List
-from supabase import create_client
+from typing import List, Optional
+from supabase import create_client, Client
 from datetime import datetime
 
 from config import settings
 from middleware.auth import get_current_user
 
 router = APIRouter()
-_supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+_supabase: Optional[Client] = None
 
-# Static challenge definitions — bugs are revealed after submission
+def get_sb() -> Client:
+    global _supabase
+    if _supabase is None:
+        _supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+    return _supabase
+
+# Static challenge definitions â€” bugs are revealed after submission
 CHALLENGES = {
     "ch1": {
         "id": "ch1",
@@ -71,7 +77,7 @@ async def submit_attempt(body: SubmitAttemptRequest, user: dict = Depends(get_cu
     score = round((found_count / total_bugs) * 100)
 
     # Save attempt
-    _supabase.table("game_attempts").insert({
+    get_sb().table("game_attempts").insert({
         "id": str(uuid.uuid4()),
         "user_id": user["user_id"],
         "challenge_id": body.challenge_id,
@@ -87,3 +93,5 @@ async def submit_attempt(body: SubmitAttemptRequest, user: dict = Depends(get_cu
         "total_bugs": total_bugs,
         "all_bugs": challenge["bugs"],  # reveal after submission
     }
+
+

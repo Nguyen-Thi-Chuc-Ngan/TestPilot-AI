@@ -1,7 +1,8 @@
-import asyncio
+﻿import asyncio
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from supabase import create_client
+from supabase import create_client, Client
+from typing import Optional
 
 from config import settings
 from middleware.auth import get_current_user
@@ -10,7 +11,13 @@ from models.scan import ScanRequest, ScanJobResponse, ScanStatusResponse
 from services.scan_service import create_scan_job, run_scan_job, stream_progress
 
 router = APIRouter()
-_supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+_supabase: Optional[Client] = None
+
+def get_sb() -> Client:
+    global _supabase
+    if _supabase is None:
+        _supabase = create_client(settings.supabase_url, settings.supabase_service_role_key)
+    return _supabase
 
 
 @router.post("", response_model=ScanJobResponse, status_code=201)
@@ -49,7 +56,7 @@ async def start_scan(
 @router.get("/{job_id}", response_model=ScanStatusResponse)
 async def get_scan_status(job_id: str, user: dict = Depends(get_current_user)):
     result = (
-        _supabase.table("scan_jobs")
+        get_sb().table("scan_jobs")
         .select("*")
         .eq("id", job_id)
         .eq("user_id", user["user_id"])
@@ -75,7 +82,7 @@ async def stream_scan(job_id: str, user: dict = Depends(get_current_user)):
     """SSE endpoint for real-time scan progress updates."""
     # Verify ownership
     result = (
-        _supabase.table("scan_jobs")
+        get_sb().table("scan_jobs")
         .select("id")
         .eq("id", job_id)
         .eq("user_id", user["user_id"])
@@ -93,3 +100,5 @@ async def stream_scan(job_id: str, user: dict = Depends(get_current_user)):
             "X-Accel-Buffering": "no",
         },
     )
+
+

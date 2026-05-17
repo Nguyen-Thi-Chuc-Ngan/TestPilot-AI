@@ -83,12 +83,12 @@ export function TestCaseTable({ cases, loading, onUpdate, onDelete, lang }: Prop
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none">
-          <option value="All">All Status</option>
+          <option value="All">{lang === 'vi' ? 'Tất cả trạng thái' : 'All Status'}</option>
           {STATUS_OPTIONS.map((s) => <option key={s}>{s}</option>)}
         </select>
         <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}
           className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none">
-          <option value="All">All Priority</option>
+          <option value="All">{lang === 'vi' ? 'Tất cả độ ưu tiên' : 'All Priority'}</option>
           {['Critical','High','Medium','Low'].map((p) => <option key={p}>{p}</option>)}
         </select>
         <span className="text-xs text-muted-foreground ml-auto">{filtered.length}/{cases.length}</span>

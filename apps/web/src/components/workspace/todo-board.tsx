@@ -90,7 +90,7 @@ export function TodoBoard() {
     }).select().single()
     if (data) setTodos((prev) => [data, ...prev])
     setQuickAdd('')
-    toast.success(t('Todo added!', 'Da them!'))
+    toast.success(t('Todo added!', 'Đã thêm!'))
   }
 
   async function updateStatus(id: string, status: string) {
@@ -101,7 +101,7 @@ export function TodoBoard() {
   async function deleteTodo(id: string) {
     await supabase.from('qa_todos').delete().eq('id', id)
     setTodos((prev) => prev.filter((t) => t.id !== id))
-    toast.success(t('Deleted', 'Da xoa'))
+    toast.success(t('Deleted', 'Đã xóa'))
   }
 
   async function saveEdit(id: string) {
@@ -109,7 +109,7 @@ export function TodoBoard() {
     setTodos((prev) => prev.map((t) => t.id === id ? { ...t, ...editData } : t))
     setEditId(null)
     setEditData({})
-    toast.success(t('Saved!', 'Da luu!'))
+    toast.success(t('Saved!', 'Đã lưu!'))
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -169,7 +169,7 @@ export function TodoBoard() {
           <button key={view} onClick={() => setActiveView(view)}
             className={cn('flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors relative',
               activeView === view ? 'text-foreground' : 'text-muted-foreground hover:text-foreground')}>
-            {t(view, view)}
+            {lang === 'vi' ? ({ Today: 'Hôm nay', All: 'Tất cả', 'In Progress': 'Đang làm', Done: 'Xong' } as Record<string, string>)[view] ?? view : view}
             <span className={cn('text-xs rounded-full px-1.5', activeView === view ? 'text-violet-500 font-bold' : 'text-muted-foreground/50')}>
               {counts[view]}
             </span>
@@ -214,7 +214,7 @@ export function TodoBoard() {
       ) : filtered.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <CheckCircle2 className="h-12 w-12 text-muted-foreground/20 mx-auto mb-3" />
-          <p className="text-muted-foreground">{t('No tasks here. Add one above!', 'Khong co viec nao. Them o tren!')}</p>
+          <p className="text-muted-foreground">{t('No tasks here. Add one above!', 'Không có việc nào. Thêm ở trên!')}</p>
         </GlassCard>
       ) : (
         <div className="space-y-2">
@@ -295,7 +295,7 @@ export function TodoBoard() {
                       /* Edit form */
                       <div className="px-4 py-3 space-y-3 bg-muted/20">
                         <input value={editData.title ?? ''} onChange={(e) => setEditData((d) => ({ ...d, title: e.target.value }))}
-                          className={inputCls} placeholder="Title" />
+                          className={inputCls} placeholder={lang === 'vi' ? 'Tiêu đề' : 'Title'} />
                         <div className="grid grid-cols-2 gap-2">
                           <select value={editData.priority ?? 'Medium'} onChange={(e) => setEditData((d) => ({ ...d, priority: e.target.value }))}
                             className={inputCls}>
@@ -311,13 +311,13 @@ export function TodoBoard() {
                             className={inputCls} placeholder="Bug ID" />
                         </div>
                         <input value={editData.notes ?? ''} onChange={(e) => setEditData((d) => ({ ...d, notes: e.target.value }))}
-                          className={inputCls} placeholder="Notes..." />
+                          className={inputCls} placeholder={lang === 'vi' ? 'Ghi chú...' : 'Notes...'} />
                         <div className="flex gap-2">
                           <button onClick={() => saveEdit(todo.id)} className="flex items-center gap-1.5 rounded-lg bg-violet-600 text-white px-3 py-1.5 text-xs hover:bg-violet-500 transition-colors">
-                            <Save className="h-3 w-3" /> {t('Save', 'Luu')}
+                            <Save className="h-3 w-3" /> {t('Save', 'Lưu')}
                           </button>
                           <button onClick={() => setEditId(null)} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-muted transition-colors">
-                            <X className="h-3 w-3" /> {t('Cancel', 'Huy')}
+                            <X className="h-3 w-3" /> {t('Cancel', 'Hủy')}
                           </button>
                         </div>
                       </div>

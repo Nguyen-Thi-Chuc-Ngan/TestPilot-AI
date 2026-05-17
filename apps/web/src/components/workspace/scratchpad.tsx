@@ -68,8 +68,8 @@ export function Scratchpad() {
                 <span className="text-sm font-semibold">{lang === 'vi' ? 'Ghi chu nhanh' : 'Scratchpad'}</span>
               </div>
               <div className="flex items-center gap-1">
-                {saving && <span className="text-[10px] text-muted-foreground">saving...</span>}
-                {!saving && content && <span className="text-[10px] text-emerald-500">saved</span>}
+                {saving && <span className="text-[10px] text-muted-foreground">{lang === 'vi' ? 'đang lưu...' : 'saving...'}</span>}
+                {!saving && content && <span className="text-[10px] text-emerald-500">{lang === 'vi' ? 'đã lưu' : 'saved'}</span>}
                 <button onClick={() => setOpen(false)} className="rounded p-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors">
                   <X className="h-3.5 w-3.5" />
                 </button>

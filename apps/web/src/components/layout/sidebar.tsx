@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ScanLine, Clock, Gamepad2, Mic, Zap,
-  BookOpen, User, Swords, AlertTriangle, Table2, CheckSquare, CalendarDays, Bug, Rocket
+  BookOpen, User, Swords, AlertTriangle, Table2, CheckSquare, CalendarDays, Bug, Rocket, Beaker, GraduationCap
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLang } from '@/stores/language-store'
@@ -23,10 +23,12 @@ const navItems = [
   { href: '/workspace/log',    icon: CalendarDays,    en: 'Daily Log',       vi: 'Nhật Ký Ngày',   group: 'workspace' },
   { href: '/notes',            icon: BookOpen,        en: 'QA Notes',        vi: 'Ghi Chú QA',     group: 'workspace' },
   // Training
+  { href: '/lab',              icon: Beaker,          en: 'QA Lab',          vi: 'Phòng Lab QA',   group: 'training' },
   { href: '/battle',           icon: Swords,          en: 'AI Battle',       vi: 'Đấu Với AI',     group: 'training' },
   { href: '/panic',            icon: AlertTriangle,   en: 'Panic Mode',      vi: 'Panic Mode',     group: 'training' },
   { href: '/game',             icon: Gamepad2,        en: 'Bug Hunt',        vi: 'Game Tìm Lỗi',   group: 'training' },
   { href: '/interview',        icon: Mic,             en: 'Interview',       vi: 'Phỏng Vấn AI',   group: 'training' },
+  { href: '/english',          icon: GraduationCap,   en: 'English Coach',   vi: 'Luyện Tiếng Anh', group: 'training' },
   { href: '/profile',          icon: User,            en: 'Profile',         vi: 'Hồ Sơ',          group: null },
 ]
 

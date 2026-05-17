@@ -63,7 +63,7 @@ export function ReleasesPage() {
     try {
       const data = await apiClient.get<Release[]>('/api/releases')
       setReleases(data)
-    } catch { toast.error('Failed to load') }
+    } catch { toast.error(lang === 'vi' ? 'Không thể tải' : 'Failed to load') }
     finally { setLoading(false) }
   }
 
@@ -88,8 +88,8 @@ export function ReleasesPage() {
       const result = await apiClient.post<{ summary: string }>(`/api/releases/${id}/ai-summary`, {})
       setReleases((prev) => prev.map((r) => r.id === id ? { ...r, ai_summary: result.summary } : r))
       setSelected((r) => r ? { ...r, ai_summary: result.summary } : r)
-      toast.success('AI summary generated!')
-    } catch { toast.error('AI failed') }
+      toast.success(lang === 'vi' ? 'Đã tạo tóm tắt AI!' : 'AI summary generated!')
+    } catch { toast.error(lang === 'vi' ? 'AI gặp lỗi' : 'AI failed') }
     finally { setGenerating(false) }
   }
 
@@ -154,13 +154,13 @@ export function ReleasesPage() {
                   {/* Stats */}
                   <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 text-center">
                     {[
-                      { label: 'Passed',   value: r.passed,         color: 'text-emerald-500' },
-                      { label: 'Failed',   value: r.failed,         color: 'text-red-500' },
-                      { label: 'Blocked',  value: r.blocked,        color: 'text-orange-500' },
-                      { label: 'Not Run',  value: r.not_run,        color: 'text-muted-foreground' },
-                      { label: 'Open Bugs',value: r.open_bugs,      color: 'text-red-500' },
-                      { label: 'Critical', value: r.critical_bugs,  color: 'text-red-600 font-black' },
-                      { label: 'Retest',   value: r.retest_pending, color: 'text-violet-500' },
+                      { label: t('Passed',    'Passed'),          value: r.passed,         color: 'text-emerald-500' },
+                      { label: t('Failed',    'Thất bại'),        value: r.failed,         color: 'text-red-500' },
+                      { label: t('Blocked',   'Bị chặn'),         value: r.blocked,        color: 'text-orange-500' },
+                      { label: t('Not Run',   'Chưa chạy'),       value: r.not_run,        color: 'text-muted-foreground' },
+                      { label: t('Open Bugs', 'Bug mở'),          value: r.open_bugs,      color: 'text-red-500' },
+                      { label: t('Critical',  'Nghiêm trọng'),    value: r.critical_bugs,  color: 'text-red-600 font-black' },
+                      { label: t('Retest',    'Retest'),          value: r.retest_pending, color: 'text-violet-500' },
                     ].map((s) => (
                       <div key={s.label} className="rounded-lg bg-muted/30 py-2">
                         <div className={cn('text-lg font-bold', s.color)}>{s.value}</div>
@@ -178,7 +178,7 @@ export function ReleasesPage() {
                             <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4">
                               <div className="flex items-center gap-2 mb-2">
                                 <Brain className="h-4 w-4 text-violet-400" />
-                                <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">AI Summary</p>
+                                <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">{lang === 'vi' ? 'Tóm Tắt AI' : 'AI Summary'}</p>
                               </div>
                               <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">{r.ai_summary}</p>
                             </div>
@@ -221,15 +221,15 @@ export function ReleasesPage() {
                 <p className="text-xs text-muted-foreground">{t('Stats will be auto-calculated from your bugs.', 'Số liệu sẽ tự tính từ bugs của bạn.')}</p>
                 <div className="grid grid-cols-2 gap-3">
                   <input value={form.release_version} onChange={(e) => setForm((f) => ({ ...f, release_version: e.target.value }))}
-                    placeholder="v2.4.1 *" className={inputCls} />
+                    placeholder={t('v2.4.1 *', 'v2.4.1 *')} className={inputCls} />
                   <input value={form.project_name} onChange={(e) => setForm((f) => ({ ...f, project_name: e.target.value }))}
                     placeholder={t('Project', 'Dự án')} className={inputCls} />
                   <input value={form.client} onChange={(e) => setForm((f) => ({ ...f, client: e.target.value }))}
-                    placeholder="Client" className={inputCls} />
+                    placeholder={t('Client', 'Khách hàng')} className={inputCls} />
                   <input value={form.sprint} onChange={(e) => setForm((f) => ({ ...f, sprint: e.target.value }))}
-                    placeholder="Sprint 12" className={inputCls} />
+                    placeholder={t('Sprint 12', 'Sprint 12')} className={inputCls} />
                   <input value={form.environment} onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-                    placeholder="Environment" className={inputCls} />
+                    placeholder={t('Environment', 'Môi trường')} className={inputCls} />
                 </div>
                 <textarea value={form.summary_notes} onChange={(e) => setForm((f) => ({ ...f, summary_notes: e.target.value }))}
                   placeholder={t('Notes...', 'Ghi chú...')} rows={2} className={cn(inputCls, 'resize-none')} />

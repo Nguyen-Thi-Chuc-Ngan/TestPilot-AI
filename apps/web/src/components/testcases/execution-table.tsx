@@ -99,12 +99,12 @@ export function ExecutionTable({ cases, loading, selectedId, onSelect, onQuickSt
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           className="rounded-lg bg-muted/50 border border-border px-2 py-1.5 text-xs text-foreground/60 focus:outline-none">
-          <option value="All">All Status</option>
+          <option value="All">{lang === 'vi' ? 'Tất cả' : 'All Status'}</option>
           {Object.keys(QA_STATUS_CONFIG).map((s) => <option key={s}>{s}</option>)}
         </select>
         <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}
           className="rounded-lg bg-muted/50 border border-border px-2 py-1.5 text-xs text-foreground/60 focus:outline-none">
-          <option value="All">All Priority</option>
+          <option value="All">{lang === 'vi' ? 'Tất cả' : 'All Priority'}</option>
           {['Critical','High','Medium','Low'].map((p) => <option key={p}>{p}</option>)}
         </select>
         <span className="text-[10px] text-muted-foreground/50 flex-shrink-0 font-mono">{totalFiltered}/{cases.length}</span>
@@ -115,7 +115,7 @@ export function ExecutionTable({ cases, loading, selectedId, onSelect, onQuickSt
         <span className="col-span-2">TC_ID</span>
         <span className="col-span-5">Title</span>
         <span className="col-span-1 text-center">P</span>
-        <span className="col-span-2 text-center">QA Status</span>
+        <span className="col-span-2 text-center">{lang === 'vi' ? 'Trạng thái QA' : 'QA Status'}</span>
         <span className="col-span-2 text-center">Dev</span>
       </div>
 

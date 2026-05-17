@@ -65,7 +65,7 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
       await apiClient.patch(`/api/bugs/${id}`, updates)
       onUpdate(id, updates)
       toast.success(t('Saved!', 'Đã lưu!'))
-    } catch { toast.error('Failed') }
+    } catch { toast.error(lang === 'vi' ? 'Thất bại' : 'Failed') }
     finally { setSaving(false) }
   }
 
@@ -76,7 +76,7 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
       onUpdate(id, { status: newStatus })
       set('status', newStatus)
       toast.success(`Marked ${newStatus}`)
-    } catch { toast.error('Failed') }
+    } catch { toast.error(lang === 'vi' ? 'Thất bại' : 'Failed') }
     finally { setSaving(false) }
   }
 
@@ -85,8 +85,8 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
     try {
       const result = await apiClient.post<Record<string, string>>(`/api/bugs/${id}/ai-rewrite`, {})
       setAiSuggestion(result)
-      toast.success('AI rewrite ready!')
-    } catch { toast.error('AI failed') }
+      toast.success(lang === 'vi' ? 'AI đã viết lại!' : 'AI rewrite ready!')
+    } catch { toast.error(lang === 'vi' ? 'AI gặp lỗi' : 'AI failed') }
     finally { setRewriting(false) }
   }
 
@@ -99,7 +99,7 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
     if (aiSuggestion.suggested_severity) set('severity', aiSuggestion.suggested_severity)
     if (aiSuggestion.suggested_priority) set('priority', aiSuggestion.suggested_priority)
     setAiSuggestion(null)
-    toast.success('Applied AI suggestions!')
+    toast.success(lang === 'vi' ? 'Đã áp dụng gợi ý AI!' : 'Applied AI suggestions!')
   }
 
   const STATUS_COLOR: Record<string, string> = {
@@ -147,7 +147,7 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
         <button onClick={aiRewrite} disabled={rewriting}
           className="ml-auto flex items-center gap-1 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-400 px-2 py-1 text-[10px] font-semibold hover:bg-violet-600/30 transition-colors disabled:opacity-40">
           {rewriting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-          AI Rewrite
+          {lang === 'vi' ? 'AI Viết Lại' : 'AI Rewrite'}
         </button>
       </div>
 
@@ -158,7 +158,7 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
         {aiSuggestion && (
           <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">AI Suggestion</p>
+              <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest">{lang === 'vi' ? 'Gợi Ý AI' : 'AI Suggestion'}</p>
               <button onClick={() => setAiSuggestion(null)} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
             </div>
             <p className="text-xs text-white/60">{aiSuggestion.title}</p>
@@ -167,7 +167,7 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
             )}
             <button onClick={applyAISuggestion}
               className="text-xs text-violet-400 border border-violet-500/30 rounded-lg px-3 py-1 hover:bg-violet-500/10 transition-colors">
-              Apply suggestion
+              {lang === 'vi' ? 'Áp dụng' : 'Apply suggestion'}
             </button>
           </div>
         )}
@@ -191,14 +191,14 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
         {/* Context */}
         <div className="grid grid-cols-2 gap-2">
           {([
-            { key: 'module' as const,          label: 'Module',       ph: 'e.g. Login' },
-            { key: 'feature' as const,         label: 'Feature',      ph: 'e.g. QR Scan' },
-            { key: 'assigned_dev' as const,    label: 'Assigned Dev', ph: 'Dev name' },
-            { key: 'environment' as const,     label: 'Environment',  ph: 'Staging / Prod' },
-            { key: 'platform' as const,        label: 'Platform',     ph: 'Android / iOS' },
-            { key: 'browser' as const,         label: 'Browser',      ph: 'Chrome 124' },
-            { key: 'release_version' as const, label: 'Release',      ph: 'v2.4.1' },
-            { key: 'fix_version' as const,     label: 'Fix Version',  ph: 'v2.4.2' },
+            { key: 'module' as const,          label: t('Module', 'Module'),               ph: 'e.g. Login' },
+            { key: 'feature' as const,         label: t('Feature', 'Tính năng'),           ph: 'e.g. QR Scan' },
+            { key: 'assigned_dev' as const,    label: t('Assigned Dev', 'Dev phụ trách'),  ph: 'Dev name' },
+            { key: 'environment' as const,     label: t('Environment', 'Môi trường'),      ph: 'Staging / Prod' },
+            { key: 'platform' as const,        label: t('Platform', 'Nền tảng'),           ph: 'Android / iOS' },
+            { key: 'browser' as const,         label: t('Browser', 'Trình duyệt'),         ph: 'Chrome 124' },
+            { key: 'release_version' as const, label: t('Release', 'Phiên bản'),           ph: 'v2.4.1' },
+            { key: 'fix_version' as const,     label: t('Fix Version', 'Phiên bản fix'),   ph: 'v2.4.2' },
           ]).map((f) => (
             <div key={f.key}>
               <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 block">{f.label}</label>
@@ -210,17 +210,17 @@ export function BugDetailDrawer({ bug, onClose, onUpdate, lang }: Props) {
 
         {/* Dev fixed date */}
         <div>
-          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 block">Dev Fixed Date</label>
+          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 block">{lang === 'vi' ? 'Ngày Dev Fix' : 'Dev Fixed Date'}</label>
           <input type="date" value={form.dev_fixed_date} onChange={(e) => set('dev_fixed_date', e.target.value)}
             className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-violet-500/50" />
         </div>
 
         {/* Content fields */}
         {([
-          { key: 'steps' as const,           label: 'Steps to Reproduce', rows: 4, ph: '1. Navigate to...\n2. Click...\n3. Observe...' },
-          { key: 'expected_result' as const, label: 'Expected Result',    rows: 2, ph: 'What should happen...' },
-          { key: 'actual_result' as const,   label: 'Actual Result',      rows: 2, ph: 'What actually happened...' },
-          { key: 'notes' as const,           label: 'Notes',              rows: 2, ph: 'Additional notes...' },
+          { key: 'steps' as const,           label: t('Steps to Reproduce', 'Các bước tái hiện'), rows: 4, ph: '1. Navigate to...\n2. Click...\n3. Observe...' },
+          { key: 'expected_result' as const, label: t('Expected Result', 'Kết quả mong đợi'),     rows: 2, ph: 'What should happen...' },
+          { key: 'actual_result' as const,   label: t('Actual Result', 'Kết quả thực tế'),        rows: 2, ph: 'What actually happened...' },
+          { key: 'notes' as const,           label: t('Notes', 'Ghi chú'),                        rows: 2, ph: 'Additional notes...' },
         ]).map((f) => (
           <div key={f.key}>
             <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 block">{f.label}</label>

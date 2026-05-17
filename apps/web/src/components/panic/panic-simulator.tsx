@@ -186,7 +186,7 @@ export function PanicSimulator() {
             {/* Answer form */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Severity</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">{lang === 'vi' ? 'Mức độ' : 'Severity'}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {SEVERITY_OPTIONS.map((s) => (
                     <button key={s} onClick={() => setAnswer((a) => ({ ...a, severity: s }))}
@@ -197,7 +197,7 @@ export function PanicSimulator() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Priority</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">{lang === 'vi' ? 'Độ ưu tiên' : 'Priority'}</label>
                 <div className="space-y-1.5">
                   {PRIORITY_OPTIONS.map((p) => (
                     <button key={p} onClick={() => setAnswer((a) => ({ ...a, priority: p }))}
@@ -210,21 +210,21 @@ export function PanicSimulator() {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Bug Title</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">{lang === 'vi' ? 'Tiêu đề Bug' : 'Bug Title'}</label>
               <input value={answer.bugTitle} onChange={(e) => setAnswer((a) => ({ ...a, bugTitle: e.target.value }))}
                 placeholder={t('Write a clear, concise bug title...', 'Viết tiêu đề bug rõ ràng, ngắn gọn...')}
                 className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-violet-500/50" />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Steps to Reproduce / Evidence</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">{lang === 'vi' ? 'Các bước tái hiện / Bằng chứng' : 'Steps to Reproduce / Evidence'}</label>
               <textarea value={answer.stepsToReproduce} onChange={(e) => setAnswer((a) => ({ ...a, stepsToReproduce: e.target.value }))}
                 rows={3} placeholder={t('1. Go to checkout\n2. Click Pay Now\n3. Nothing happens', '1. Vào checkout\n2. Bấm Thanh toán\n3. Không có gì xảy ra')}
                 className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-violet-500/50 resize-none font-mono" />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">Immediate Next Action</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 block">{lang === 'vi' ? 'Hành động tiếp theo' : 'Immediate Next Action'}</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {NEXT_ACTIONS.map((a) => (
                   <button key={a} onClick={() => setAnswer((ans) => ({ ...ans, nextAction: a }))}

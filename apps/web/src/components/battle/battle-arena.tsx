@@ -170,7 +170,7 @@ export function BattleArena() {
               <div className="rounded-lg border border-border overflow-hidden">
                 <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-3 py-2">
                   <div className="flex gap-1.5"><div className="h-2.5 w-2.5 rounded-full bg-red-400"/><div className="h-2.5 w-2.5 rounded-full bg-yellow-400"/><div className="h-2.5 w-2.5 rounded-full bg-green-400"/></div>
-                  <span className="text-xs text-muted-foreground font-mono">Broken Login Form — 8 hidden bugs</span>
+                  <span className="text-xs text-muted-foreground font-mono">{lang === 'vi' ? 'Form Đăng Nhập — 8 bug ẩn' : 'Broken Login Form — 8 hidden bugs'}</span>
                 </div>
                 <iframe src="/demo-site/index.html" className="w-full h-48 bg-white" title="Challenge" />
               </div>
@@ -212,7 +212,7 @@ export function BattleArena() {
               {/* Demo page */}
               <div className="rounded-xl border border-border overflow-hidden">
                 <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-3 py-2">
-                  <span className="text-xs text-muted-foreground font-mono">Broken Login Form — find the bugs!</span>
+                  <span className="text-xs text-muted-foreground font-mono">{lang === 'vi' ? 'Form Đăng Nhập — tìm bug đi!' : 'Broken Login Form — find the bugs!'}</span>
                 </div>
                 <iframe src="/demo-site/index.html" className="w-full h-80 bg-white" title="Find bugs" />
               </div>
@@ -264,8 +264,8 @@ export function BattleArena() {
             <GlassCard className="p-8 border border-violet-500/20 bg-violet-500/5 text-center space-y-4">
               <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }} className="h-16 w-16 rounded-2xl border-2 border-violet-500/50 border-t-violet-400 mx-auto" />
               <div>
-                <h2 className="text-xl font-bold text-violet-400">AI is analyzing...</h2>
-                <p className="text-sm text-muted-foreground mt-1">Comparing results in 3 seconds</p>
+                <h2 className="text-xl font-bold text-violet-400">{lang === 'vi' ? 'AI đang phân tích...' : 'AI is analyzing...'}</h2>
+                <p className="text-sm text-muted-foreground mt-1">{lang === 'vi' ? 'So sánh kết quả trong 3 giây' : 'Comparing results in 3 seconds'}</p>
               </div>
               <div className="max-w-md mx-auto text-left">
                 <AIActivityFeed lines={AI_ACTIVITY} maxLines={6} />

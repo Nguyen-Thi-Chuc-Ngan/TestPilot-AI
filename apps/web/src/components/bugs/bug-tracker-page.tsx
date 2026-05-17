@@ -73,22 +73,22 @@ export function BugTrackerPage() {
       if (search) params.set('search', search)
       const data = await apiClient.get<BugItem[]>(`/api/bugs?${params}`)
       setBugs(data)
-    } catch { toast.error('Failed to load bugs') }
+    } catch { toast.error(lang === 'vi' ? 'Không thể tải danh sách bug' : 'Failed to load bugs') }
     finally { setLoading(false) }
   }
 
   useEffect(() => { load() }, [filterStatus, filterSeverity])
 
   async function createBug() {
-    if (!form.title.trim()) { toast.error('Title required'); return }
+    if (!form.title.trim()) { toast.error(lang === 'vi' ? 'Vui lòng nhập tiêu đề' : 'Title required'); return }
     setSaving(true)
     try {
       const bug = await apiClient.post<BugItem>('/api/bugs', form)
       setBugs((prev) => [bug, ...prev])
       setShowCreate(false)
       setForm({ title: '', severity: 'Minor', priority: 'Medium', status: 'Open', project_name: '', module: '', assigned_dev: '', steps: '', expected_result: '', actual_result: '', notes: '' })
-      toast.success(`${bug.bug_id} created!`)
-    } catch (e) { toast.error(e instanceof Error ? e.message : 'Failed') }
+      toast.success(lang === 'vi' ? `${bug.bug_id} đã được tạo!` : `${bug.bug_id} created!`)
+    } catch (e) { toast.error(e instanceof Error ? e.message : (lang === 'vi' ? 'Thất bại' : 'Failed')) }
     finally { setSaving(false) }
   }
 
@@ -123,9 +123,9 @@ export function BugTrackerPage() {
               {t('Bug Tracker', 'Theo Dõi Bug')}
             </h1>
             <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
-              <span className="text-red-500 font-bold">{counts.open} open</span>
-              <span className="text-orange-500 font-bold">{counts.critical} critical</span>
-              <span className="text-violet-500 font-bold">{counts.retest} retest needed</span>
+              <span className="text-red-500 font-bold">{counts.open} {lang === 'vi' ? 'đang mở' : 'open'}</span>
+              <span className="text-orange-500 font-bold">{counts.critical} {lang === 'vi' ? 'nghiêm trọng' : 'critical'}</span>
+              <span className="text-violet-500 font-bold">{counts.retest} {lang === 'vi' ? 'cần retest' : 'retest needed'}</span>
             </div>
           </div>
           <GlowButton onClick={() => setShowCreate(true)} icon={<Plus className="h-4 w-4" />}>
@@ -144,12 +144,12 @@ export function BugTrackerPage() {
           </div>
           <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
             className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none">
-            <option value="All">All Status</option>
+            <option value="All">{lang === 'vi' ? 'Tất cả trạng thái' : 'All Status'}</option>
             {STATUSES.map((s) => <option key={s}>{s}</option>)}
           </select>
           <select value={filterSeverity} onChange={(e) => setFilterSeverity(e.target.value)}
             className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none">
-            <option value="All">All Severity</option>
+            <option value="All">{lang === 'vi' ? 'Tất cả severity' : 'All Severity'}</option>
             {SEVERITIES.map((s) => <option key={s}>{s}</option>)}
           </select>
           <span className="text-xs text-muted-foreground">{filtered.length}/{bugs.length}</span>
@@ -192,7 +192,7 @@ export function BugTrackerPage() {
                     <button
                       onClick={(e) => { e.stopPropagation(); const next = STATUSES[(STATUSES.indexOf(bug.status)+1)%STATUSES.length]; quickStatus(bug.id, next) }}
                       className={cn('w-32 flex-shrink-0 text-center text-[10px] font-medium truncate hover:opacity-70 transition-opacity', STATUS_CFG[bug.status] ?? 'text-muted-foreground')}
-                      title="Click to change status"
+                      title={lang === 'vi' ? 'Bấm để đổi trạng thái' : 'Click to change status'}
                     >
                       {bug.status}
                     </button>

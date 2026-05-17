@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — AppName</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .card { background: white; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .logo { text-align: center; margin-bottom: 28px; }
+  .logo h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+  .logo p { font-size: 13px; color: #64748b; margin-top: 4px; }
+  .field { margin-bottom: 18px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+  input[type="email"], input[type="text"], input[type="password"] {
+    width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+    font-size: 14px; color: #111; outline: none; transition: border-color .2s;
+  }
+  input:focus { border-color: #6366f1; }
+  .btn { width: 100%; padding: 11px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background .2s; }
+  .btn:hover { background: #4f46e5; }
+  .error-msg { color: #ef4444; font-size: 12px; margin-top: 5px; display: none; }
+  .footer-link { text-align: center; font-size: 13px; color: #64748b; margin-top: 20px; }
+  .footer-link a { color: #6366f1; text-decoration: none; font-weight: 500; }
+
+  /* ── BUG: l3 — password shows as text ── */
+  body.bug-l3 input#password { -webkit-text-security: none; }
+
+  /* ── BUG: l4 — no focus ring on button ── */
+  body.bug-l4 .btn:focus { outline: none; box-shadow: none; }
+
+  /* ── BUG: l10 — low contrast placeholder ── */
+  body.bug-l10 input::placeholder { color: #d1d5db; }
+
+  /* ── BUG: l9 — bad button text (handled via JS) ── */
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <h1>AppName</h1>
+    <p>Sign in to your account</p>
+  </div>
+
+  <form id="loginForm" novalidate>
+    <div class="field">
+      <!-- BUG l5: missing label association -->
+      <label for="email">Email address</label>
+      <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+      <div class="error-msg" id="emailError">Please enter a valid email address.</div>
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <!-- BUG l3: type will be changed to "text" by JS if bug active -->
+      <input type="password" id="password" name="password" placeholder="Enter your password">
+      <div class="error-msg" id="pwError">Password is required.</div>
+    </div>
+
+    <button type="submit" class="btn" id="submitBtn">Sign In</button>
+  </form>
+
+  <div class="footer-link">
+    Don't have an account? <a href="#">Sign up free</a>
+  </div>
+</div>
+
+<script>
+  // Read injected bugs from parent via URL params or window flags
+  const params = new URLSearchParams(window.location.search);
+  const bugs = (params.get('bugs') || '').split(',').filter(Boolean);
+
+  // Apply bug classes to body
+  bugs.forEach(b => document.body.classList.add('bug-' + b));
+
+  // BUG l3: Change password to plain text
+  if (bugs.includes('l3')) {
+    document.getElementById('password').type = 'text';
+  }
+
+  // BUG l9: Change button text to non-descriptive
+  if (bugs.includes('l9')) {
+    document.getElementById('submitBtn').textContent = 'Click Here';
+  }
+
+  // BUG l5: Remove label association
+  if (bugs.includes('l5')) {
+    document.querySelector('label[for="email"]').removeAttribute('for');
+    document.getElementById('email').removeAttribute('id');
+    document.getElementById('email') || document.querySelector('input[type=email]');
+  }
+
+  // Form submission logic
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.querySelector('input[type="email"], input[name="email"]').value;
+    const password = document.getElementById('password').value;
+    let valid = true;
+
+    // BUG l1: skip email validation entirely
+    if (!bugs.includes('l1')) {
+      if (!email) { document.getElementById('emailError').style.display = 'block'; valid = false; }
+      else document.getElementById('emailError').style.display = 'none';
+    } else {
+      // bug active: always hide error, accept anything
+      document.getElementById('emailError').style.display = 'none';
+    }
+
+    // BUG l2: skip format validation
+    if (!bugs.includes('l2') && email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) { document.getElementById('emailError').textContent = 'Invalid email format'; document.getElementById('emailError').style.display = 'block'; valid = false; }
+    }
+
+    // BUG l8: skip password length check
+    if (!bugs.includes('l8')) {
+      if (password.length < 8) { document.getElementById('pwError').style.display = 'block'; valid = false; }
+      else document.getElementById('pwError').style.display = 'none';
+    } else {
+      document.getElementById('pwError').style.display = 'none';
+    }
+
+    // BUG l6: don't clear error on retype (handled by not adding input listener)
+    if (!bugs.includes('l6')) {
+      document.getElementById('email') && document.querySelector('input[name="email"]')?.addEventListener('input', () => {
+        document.getElementById('emailError').style.display = 'none';
+      });
+    }
+
+    if (valid) {
+      alert('Login successful! (Demo)');
+    }
+  });
+</script>
+</body>
+</html>

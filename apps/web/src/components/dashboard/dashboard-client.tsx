@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -48,7 +48,7 @@ export function DashboardClient({ recentScans, totalScans, totalFindings }: Prop
   ]
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <motion.div initial="hidden" animate="show" variants={stagger} className="flex items-center justify-between">
         <motion.div variants={fadeUp}>

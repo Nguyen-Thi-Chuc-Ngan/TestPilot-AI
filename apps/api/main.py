@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import structlog
 
 from config import settings
-from routers import scan, report, interview, game
+from routers import scan, report, interview, game, testcases, bugs, releases
 
 logger = structlog.get_logger()
 
@@ -35,6 +35,9 @@ app.include_router(scan.router, prefix="/api/scan", tags=["scan"])
 app.include_router(report.router, prefix="/api/report", tags=["report"])
 app.include_router(interview.router, prefix="/api/interview", tags=["interview"])
 app.include_router(game.router, prefix="/api/game", tags=["game"])
+app.include_router(testcases.router, prefix="/api/testcases", tags=["testcases"])
+app.include_router(bugs.router,      prefix="/api/bugs",      tags=["bugs"])
+app.include_router(releases.router,  prefix="/api/releases",  tags=["releases"])
 
 
 @app.get("/health")

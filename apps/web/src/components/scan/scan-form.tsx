@@ -12,6 +12,7 @@ import { apiClient } from '@/lib/api-client'
 import { useLang } from '@/stores/language-store'
 import { GlowButton } from '@/components/ui/glow-button'
 import { cn } from '@/lib/utils'
+import { translateError } from '@/lib/error-messages'
 
 const scanSchema = z.object({
   url: z.string().url('Please enter a valid URL (include https://)').max(2048),
@@ -67,7 +68,8 @@ export function ScanForm() {
       toast.success(lang === 'vi' ? 'Đã bắt đầu quét!' : 'Scan started!')
       router.push(`/scan/${result.job_id}`)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to start scan')
+      const msg = err instanceof Error ? err.message : 'Failed to start scan'
+      toast.error(translateError(msg, lang as 'en' | 'vi'))
       setLoading(false)
     }
   }

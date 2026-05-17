@@ -19,7 +19,7 @@ def check_scan_rate_limit(user_id: str) -> None:
     if len(_scan_counts[user_id]) >= limit:
         raise HTTPException(
             status_code=429,
-            detail=f"Rate limit exceeded: max {limit} scans per hour. Try again later.",
+            detail=f"You've reached the limit of {limit} scans per hour. Please wait a bit before scanning again.",
         )
 
     _scan_counts[user_id].append(now)

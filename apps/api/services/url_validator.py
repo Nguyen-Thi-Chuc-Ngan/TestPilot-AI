@@ -29,31 +29,37 @@ ALLOWED_SCHEMES = {"http", "https"}
 def validate_scan_url(url: str) -> str:
     """Validate URL for scanning — blocks SSRF targets."""
     if len(url) > 2048:
-        raise ValueError("URL too long (max 2048 chars)")
+        raise ValueError("URL is too long. Please use a shorter URL (max 2048 characters).")
 
     try:
         parsed = urlparse(url)
     except Exception:
-        raise ValueError("Invalid URL format")
+        raise ValueError("Invalid URL format. Make sure it starts with https:// or http://")
 
     if parsed.scheme.lower() not in ALLOWED_SCHEMES:
-        raise ValueError(f"Only http:// and https:// URLs are allowed")
+        raise ValueError("Only https:// and http:// URLs are supported. Please enter a valid web address.")
 
     hostname = parsed.hostname
     if not hostname:
-        raise ValueError("URL must have a valid hostname")
+        raise ValueError("URL is missing a hostname. Example: https://example.com")
 
     if hostname.lower() in BLOCKED_HOSTS:
-        raise ValueError(f"Scanning {hostname} is not allowed")
+        raise ValueError(
+            f"'{hostname}' cannot be scanned. Only public websites are allowed — "
+            "localhost and internal addresses are blocked for security."
+        )
 
     # Check if hostname resolves to a private IP
     try:
         ip = ipaddress.ip_address(hostname)
         for blocked_range in BLOCKED_IP_RANGES:
             if ip in blocked_range:
-                raise ValueError(f"Scanning private IP ranges is not allowed")
+                raise ValueError(
+                    f"Private IP addresses ({ip}) cannot be scanned. "
+                    "Please use a publicly accessible URL."
+                )
     except ValueError as e:
-        if "not allowed" in str(e):
+        if "cannot be scanned" in str(e):
             raise
         # Not an IP address — that's fine, it's a hostname
     except Exception:

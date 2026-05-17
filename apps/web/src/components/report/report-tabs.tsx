@@ -8,6 +8,7 @@ import { TestCasesPanel } from './test-cases-panel'
 import { BugReportsPanel } from './bug-reports-panel'
 import { ScriptPanel } from './script-panel'
 import { toast } from 'sonner'
+import { useLang } from '@/stores/language-store'
 import { SeverityBadge } from '@/components/ui/severity-badge'
 import { GlassCard } from '@/components/ui/glass-card'
 import { GlowButton } from '@/components/ui/glow-button'
@@ -33,6 +34,7 @@ const severityCount = (findings: Record<string, unknown>[], sev: string) =>
 
 export function ReportTabs({ job, findings, testCases, bugReports, artifacts }: Props) {
   const [activeTab, setActiveTab] = useState('findings')
+  const { lang } = useLang()
   const [exporting, setExporting] = useState(false)
   const scriptArtifact = artifacts.find((a) => (a as { type: string }).type === 'script')
 
@@ -51,7 +53,7 @@ export function ReportTabs({ job, findings, testCases, bugReports, artifacts }: 
       const a = document.createElement('a'); a.href = url; a.download = `testpilot-report.${format}`; a.click()
       URL.revokeObjectURL(url)
       toast.success(`Exported as ${format.toUpperCase()}`)
-    } catch { toast.error('Export failed') }
+    } catch { toast.error(lang === 'vi' ? 'Xuất file thất bại. Vui lòng thử lại.' : 'Export failed. Please try again.') }
     finally { setExporting(false) }
   }
 
@@ -97,22 +99,22 @@ export function ReportTabs({ job, findings, testCases, bugReports, artifacts }: 
       </GlassCard>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-white/[0.06] pb-0">
+      <div className="flex gap-1 border-b border-border pb-0">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className="relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors"
           >
-            <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-violet-400' : 'text-white/30'}`} />
-            <span className={activeTab === tab.id ? 'text-white' : 'text-white/40'}>{tab.label}</span>
+            <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-violet-500' : 'text-muted-foreground'}`} />
+            <span className={activeTab === tab.id ? 'text-foreground' : 'text-muted-foreground'}>{tab.label}</span>
             {tab.id === 'findings' && findings.length > 0 && (
-              <span className="rounded-full bg-violet-500/20 px-1.5 py-0.5 text-[10px] text-violet-300 font-bold">
+              <span className="rounded-full bg-violet-500/20 px-1.5 py-0.5 text-[10px] text-violet-600 dark:text-violet-300 font-bold">
                 {findings.length}
               </span>
             )}
             {tab.id === 'testcases' && testCases.length > 0 && (
-              <span className="rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[10px] text-blue-300 font-bold">
+              <span className="rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[10px] text-blue-600 dark:text-blue-300 font-bold">
                 {testCases.length}
               </span>
             )}

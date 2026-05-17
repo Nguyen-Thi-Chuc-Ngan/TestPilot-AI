@@ -65,7 +65,7 @@ export function FindingsPanel({ findings }: { findings: Record<string, unknown>[
                 </span>
                 <span className="flex-1 text-sm font-medium truncate">{f.title}</span>
                 <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  <ChevronDown className="h-4 w-4 text-white/30 flex-shrink-0" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
                 </motion.div>
               </button>
 
@@ -78,20 +78,23 @@ export function FindingsPanel({ findings }: { findings: Record<string, unknown>[
                     transition={{ duration: 0.25 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-4 pb-4 space-y-3 border-t border-white/[0.05] pt-4">
-                      <p className="text-sm text-white/60 leading-relaxed">{f.description}</p>
+                    <div className="px-4 pb-4 space-y-3 border-t border-border pt-4">
+                      {f.description
+                        ? <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
+                        : <p className="text-sm text-muted-foreground/40 italic">No description provided.</p>
+                      }
 
                       {f.element_hint && (
                         <div className="flex items-start gap-2">
-                          <span className="text-xs text-white/30 font-mono mt-0.5 flex-shrink-0">WHERE</span>
-                          <span className="text-xs text-white/50 font-mono">{f.element_hint}</span>
+                          <span className="text-xs text-muted-foreground/50 font-mono mt-0.5 flex-shrink-0">WHERE</span>
+                          <span className="text-xs text-muted-foreground font-mono">{f.element_hint}</span>
                         </div>
                       )}
 
                       {f.recommendation && (
-                        <div className="rounded-lg border border-violet-500/20 bg-violet-500/5 p-3">
-                          <p className="text-xs font-bold text-violet-400 uppercase tracking-wider mb-1">Fix</p>
-                          <p className="text-sm text-white/60">{f.recommendation}</p>
+                        <div className="rounded-lg border border-violet-200 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/5 p-3">
+                          <p className="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider mb-1">Fix</p>
+                          <p className="text-sm text-foreground/70">{f.recommendation}</p>
                         </div>
                       )}
 

@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { useLang } from '@/stores/language-store'
 import { GlassCard } from '@/components/ui/glass-card'
 import { GlowButton } from '@/components/ui/glow-button'
+import { translateError } from '@/lib/error-messages'
 import { AIStatusPill } from '@/components/ui/ai-status-pill'
 import { AIActivityFeed } from '@/components/ui/ai-activity-feed'
 
@@ -54,7 +55,9 @@ export function ScanProgress({ job }: { job: ScanJob }) {
   const { lang } = useLang()
   const [currentStep, setCurrentStep] = useState(0)
   const [failed, setFailed] = useState(job.status === 'failed')
-  const [errorMsg, setErrorMsg] = useState(job.error_msg ?? '')
+  const [errorMsg, setErrorMsg] = useState(
+    job.error_msg ? translateError(job.error_msg, lang as 'en' | 'vi') : ''
+  )
   const [retrying, setRetrying] = useState(false)
 
   async function handleRetry() {
@@ -66,10 +69,11 @@ export function ScanProgress({ job }: { job: ScanJob }) {
         mode: job.mode ?? 'full',
         roast_mode: job.roast_mode ?? false,
       })
-      toast.success('Scan restarted!')
+      toast.success(lang === 'vi' ? 'Đã khởi động lại quét!' : 'Scan restarted!')
       router.push(`/scan/${result.job_id}`)
-    } catch {
-      toast.error('Failed to retry')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to retry'
+      toast.error(translateError(msg, lang as 'en' | 'vi'))
       setRetrying(false)
     }
   }
@@ -83,7 +87,11 @@ export function ScanProgress({ job }: { job: ScanJob }) {
         const data = await apiClient.get<{ status: string; error_msg?: string; progress_step?: number }>(`/api/scan/${job.id}`)
         if (data.progress_step !== undefined) setCurrentStep(data.progress_step)
         if (data.status === 'completed') { setCurrentStep(7); clearInterval(poll); router.refresh() }
-        if (data.status === 'failed') { setFailed(true); setErrorMsg(data.error_msg ?? ''); clearInterval(poll) }
+        if (data.status === 'failed') {
+          setFailed(true)
+          setErrorMsg(data.error_msg ? translateError(data.error_msg, lang as 'en' | 'vi') : '')
+          clearInterval(poll)
+        }
       } catch { /* keep polling */ }
     }, 3000)
 

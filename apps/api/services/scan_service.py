@@ -19,6 +19,44 @@ logger = structlog.get_logger()
 _supabase: Optional[Client] = None
 
 
+def _friendly_error(e: Exception) -> str:
+    """Convert raw exceptions into human-readable messages."""
+    msg = str(e).lower()
+
+    if "429" in msg or "resource_exhausted" in msg or "quota" in msg:
+        return "AI quota exceeded. The AI service is temporarily rate-limited. Please try again in a few minutes."
+
+    if "retryerror" in msg or "clienterror" in msg:
+        return "AI service is unavailable right now. Please wait a moment and try again."
+
+    if "timeout" in msg or "timed out" in msg:
+        return "The website took too long to load (>30s). Try a faster or simpler URL."
+
+    if "net::err" in msg or "connection refused" in msg or "name or service not known" in msg:
+        return "Could not reach the website. Make sure the URL is publicly accessible."
+
+    if "ssrf" in msg or "not allowed" in msg or "private ip" in msg or "localhost" in msg:
+        return "This URL is not allowed to be scanned (localhost or private network)."
+
+    if "invalid input syntax for type uuid" in msg:
+        return "Internal data error: AI returned invalid ID format. Please try again."
+
+    if "supabase" in msg or "postgrest" in msg or "pgrst" in msg:
+        return "Database error while saving results. Please try again."
+
+    if "playwright" in msg or "browser" in msg or "chromium" in msg:
+        return "Browser automation failed. The page may be blocking automated access."
+
+    if "json" in msg or "parse" in msg or "decode" in msg:
+        return "AI returned an unexpected response format. Please try again."
+
+    # Fallback — truncate long technical errors
+    raw = str(e)
+    if len(raw) > 120:
+        raw = raw[:120] + "..."
+    return f"Scan failed: {raw}"
+
+
 def get_supabase() -> Client:
     global _supabase
     if _supabase is None:
@@ -213,12 +251,14 @@ async def run_scan_job(
         logger.info("scan_completed", job_id=job_id, url=url)
 
     except Exception as e:
-        logger.error("scan_failed", job_id=job_id, error=str(e))
+        import traceback
+        logger.error("scan_failed", job_id=job_id, error=str(e), traceback=traceback.format_exc())
+        friendly = _friendly_error(e)
         get_supabase().table("scan_jobs").update({
             "status": "failed",
-            "error_msg": str(e),
+            "error_msg": friendly,
         }).eq("id", job_id).execute()
-        await _emit(job_id, -1, status="failed", error=str(e))
+        await _emit(job_id, -1, status="failed", error=friendly)
     finally:
         _progress_queues.pop(job_id, None)
 

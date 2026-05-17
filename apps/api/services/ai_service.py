@@ -34,15 +34,69 @@ def get_gemini() -> genai.Client:
 
 
 def _parse_json(text: str) -> dict:
+    """Robustly extract JSON from model output."""
     text = text.strip()
+    # Strip markdown fences
     if text.startswith("```"):
         lines = text.split("\n")
-        text = "\n".join(lines[1:-1])
+        text = "\n".join(lines[1:-1]).strip()
+    # Extract first complete JSON object
     start = text.find("{")
-    end = text.rfind("}") + 1
-    if start != -1 and end > start:
-        text = text[start:end]
-    return json.loads(text)
+    if start == -1:
+        raise ValueError("No JSON object found in response")
+    # Find matching closing brace
+    depth = 0
+    end = -1
+    for i, ch in enumerate(text[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                end = i + 1
+                break
+    if end == -1:
+        raise ValueError("Incomplete JSON object in response")
+    return json.loads(text[start:end])
+
+
+def _sanitize_finding(f: dict) -> dict:
+    """Ensure finding has all required fields with valid values."""
+    valid_severities = {"critical", "high", "medium", "low", "info"}
+    valid_categories = {"layout", "typography", "color", "accessibility", "usability", "content"}
+    return {
+        "id": str(f.get("id", f"finding-{id(f)}")),
+        "category": f.get("category", "usability") if f.get("category") in valid_categories else "usability",
+        "title": str(f.get("title", "Untitled issue"))[:200],
+        "description": str(f.get("description", "")),
+        "severity": f.get("severity", "medium") if f.get("severity") in valid_severities else "medium",
+        "element_hint": f.get("element_hint") or f.get("location") or None,
+        "recommendation": f.get("recommendation") or f.get("fix") or None,
+        "roast_comment": f.get("roast_comment") or None,
+    }
+
+
+def _sanitize_test_case(tc: dict, idx: int) -> dict:
+    """Ensure test case has all required fields."""
+    import uuid
+    steps_raw = tc.get("steps", [])
+    steps = []
+    for i, s in enumerate(steps_raw):
+        if isinstance(s, dict):
+            steps.append({"step": s.get("step", i+1), "action": str(s.get("action", "")), "expected": str(s.get("expected", ""))})
+        elif isinstance(s, str):
+            steps.append({"step": i+1, "action": s, "expected": ""})
+    return {
+        "id": str(tc.get("id", str(uuid.uuid4()))),
+        "case_id": str(tc.get("case_id", f"TC-{idx+1:03d}")),
+        "title": str(tc.get("title", f"Test case {idx+1}"))[:200],
+        "category": tc.get("category", "functional"),
+        "priority": tc.get("priority", "medium") if tc.get("priority") in {"high","medium","low"} else "medium",
+        "preconditions": [str(p) for p in tc.get("preconditions", [])],
+        "steps": steps,
+        "expected_result": str(tc.get("expected_result", "")),
+        "test_data": json.dumps(tc["test_data"]) if isinstance(tc.get("test_data"), (dict, list)) else (tc.get("test_data") or None),
+    }
 
 
 @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=2, max=10))
@@ -115,7 +169,14 @@ Minimum 3 findings, maximum 12."""
     )
     data = _parse_json(response.choices[0].message.content)
     logger.info("vision_groq_ok", url=url)
-    return AIFindingsResponse(**data)
+    # Sanitize findings to avoid ValidationError from malformed AI output
+    raw_findings = data.get("findings", [])
+    sanitized = [_sanitize_finding(f) for f in raw_findings if isinstance(f, dict)]
+    return AIFindingsResponse(
+        findings=sanitized,  # type: ignore[arg-type]
+        overall_score=int(data.get("overall_score", 50)),
+        summary=str(data.get("summary", "")),
+    )
 
 
 @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=2, max=10))
@@ -165,7 +226,9 @@ Generate 8-12 test cases."""
         max_tokens=4096,
     )
     data = _parse_json(response.choices[0].message.content)
-    return AITestCasesResponse(**data)
+    raw_tcs = data.get("test_cases", [])
+    sanitized_tcs = [_sanitize_test_case(tc, i) for i, tc in enumerate(raw_tcs) if isinstance(tc, dict)]
+    return AITestCasesResponse(test_cases=sanitized_tcs)  # type: ignore[arg-type]
 
 
 @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=2, max=10))

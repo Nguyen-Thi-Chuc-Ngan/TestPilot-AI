@@ -31,13 +31,7 @@ interface Props {
 
 export function PageHeader({ titleKey, descKey }: Props) {
   const { lang } = useLang()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => setMounted(true), [])
-
-  // Render English on server/before mount to avoid hydration mismatch
-  const tx = mounted ? (translations[lang] ?? translations.en) : translations.en
-
+  const tx = translations[lang] ?? translations.en
   return (
     <div>
       <h1 className="text-2xl font-bold">{tx[titleKey]}</h1>

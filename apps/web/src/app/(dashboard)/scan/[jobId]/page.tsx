@@ -14,44 +14,22 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ScanDetailPage({ params }: Props) {
   const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   const { data: job } = await supabase
-    .from('scan_jobs')
-    .select('*')
-    .eq('id', params.jobId)
-    .eq('user_id', user.id)
-    .single()
+    .from('scan_jobs').select('*').eq('id', params.jobId).eq('user_id', user.id).single()
 
   if (!job) notFound()
 
   if (job.status === 'completed') {
-    const { data: findings } = await supabase
-      .from('findings')
-      .select('*')
-      .eq('job_id', job.id)
-
-    const { data: testCases } = await supabase
-      .from('test_cases')
-      .select('*')
-      .eq('job_id', job.id)
-
-    const { data: bugReports } = await supabase
-      .from('bug_reports')
-      .select('*, findings(*)')
-      .eq('job_id', job.id)
-
-    const { data: artifacts } = await supabase
-      .from('artifacts')
-      .select('*')
-      .eq('job_id', job.id)
+    const { data: findings }   = await supabase.from('findings').select('*').eq('job_id', job.id)
+    const { data: testCases }  = await supabase.from('test_cases').select('*').eq('job_id', job.id)
+    const { data: bugReports } = await supabase.from('bug_reports').select('*, findings(*)').eq('job_id', job.id)
+    const { data: artifacts }  = await supabase.from('artifacts').select('*').eq('job_id', job.id)
 
     return (
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Scan Report</h1>
@@ -70,9 +48,5 @@ export default async function ScanDetailPage({ params }: Props) {
     )
   }
 
-  return (
-    <div className="max-w-5xl mx-auto">
-      <ScanProgress job={job} />
-    </div>
-  )
+  return <ScanProgress job={job} />
 }

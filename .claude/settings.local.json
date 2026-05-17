@@ -25,7 +25,11 @@
       "PowerShell(pip install groq 2>&1)",
       "PowerShell(pip show groq 2>&1)",
       "PowerShell(Stop-Process -Force)",
-      "PowerShell(Get-ChildItem \"d:\\\\workspace\\\\Tester\\\\TestPilot-AI\\\\apps\\\\web\\\\src\\\\app\\\\\\(dashboard\\)\" -Recurse -Filter \"page.tsx\" | ForEach-Object { Select-String -Path $_.FullName -Pattern \"max-w-\" | Select-Object Path, Line })"
+      "PowerShell(Get-ChildItem \"d:\\\\workspace\\\\Tester\\\\TestPilot-AI\\\\apps\\\\web\\\\src\\\\app\\\\\\(dashboard\\)\" -Recurse -Filter \"page.tsx\" | ForEach-Object { Select-String -Path $_.FullName -Pattern \"max-w-\" | Select-Object Path, Line })",
+      "PowerShell(Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force; Get-NetTCPConnection -LocalPort 3000,8000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }; Write-Host \"Cleared\")",
+      "PowerShell(pip install openpyxl pandas xlsxwriter 2>&1)",
+      "PowerShell(Invoke-RestMethod \"http://localhost:8000/api/testcases/suites\" -ErrorAction SilentlyContinue 2>&1)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }; Start-Sleep -Seconds 1; cd \"d:\\\\workspace\\\\Tester\\\\TestPilot-AI\\\\apps\\\\web\"; pnpm dev 2>&1)"
     ]
   }
 }
